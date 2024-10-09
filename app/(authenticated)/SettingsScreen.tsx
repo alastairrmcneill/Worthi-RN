@@ -1,12 +1,13 @@
 import { Button, StyleSheet, View } from "react-native";
 import React from "react";
-import auth from "@react-native-firebase/auth";
 import { AuthService } from "@/services/AuthService";
+import { useAuth } from "@clerk/clerk-expo";
 
 export default function Page() {
+  const { signOut } = useAuth();
   return (
     <View style={styles.container}>
-      <Button onPress={() => AuthService.signOut()} title="Sign Out" />
+      <Button onPress={() => signOut()} title="Sign Out" />
     </View>
   );
 }

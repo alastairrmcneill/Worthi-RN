@@ -1,12 +1,13 @@
 import { StyleSheet, View, Text } from "react-native";
 import React, { useState } from "react";
-import auth from "@react-native-firebase/auth";
 import { Colors } from "@/constants/Colors";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Yup from "yup";
 import { AppForm, SubmitButton, TextFormField } from "@/components/forms";
 import Toast from "react-native-toast-message";
+import { useSignIn } from "@clerk/clerk-expo";
+import { useRouter } from "expo-router";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().email("Please enter a valid email.").required("Email is required."),
@@ -15,23 +16,37 @@ const validationSchema = Yup.object().shape({
 export default function Page() {
   const [isLoading, setIsLoading] = useState(false);
   const headerHeight = useHeaderHeight();
+  const { signIn } = useSignIn();
+  const router = useRouter();
 
   const forgotPassword = async (values: any) => {
     const { email } = values;
-
     setIsLoading(true);
+
     try {
-      await auth().sendPasswordResetEmail(email);
+      await signIn
+        ?.create({
+          strategy: "reset_password_email_code",
+          identifier: email,
+        })
+        .then((res) => {
+          Toast.show({
+            type: "success",
+            text1: "Email Sent!",
+            text2: "Please check your email for your secure code.",
+          });
+          router.push({
+            pathname: "/(public)/reset_password_screen",
+            params: { email },
+          });
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     } catch (error) {
       console.error(error);
     }
     setIsLoading(false);
-
-    Toast.show({
-      type: "success",
-      text1: "Email Sent!",
-      text2: "Please check your email for further instructions.",
-    });
   };
 
   return (

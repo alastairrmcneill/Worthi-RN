@@ -33,6 +33,18 @@ export default function Layout() {
           headerTitle: "",
         }}
       />
+      <Stack.Screen
+        name="reset_password_screen"
+        options={{
+          headerLeft: () => (
+            <TouchableOpacity onPress={() => router.back()}>
+              <MaterialCommunityIcons name="arrow-left" size={24} color={Colors.text} />
+            </TouchableOpacity>
+          ),
+          headerTransparent: true,
+          headerTitle: "",
+        }}
+      />
     </Stack>
   );
 }

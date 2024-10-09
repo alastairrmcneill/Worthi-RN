@@ -1,6 +1,5 @@
 import { StyleSheet, View, Text, TextInput, KeyboardAvoidingView, TouchableOpacity, Alert } from "react-native";
 import React, { useState } from "react";
-import auth from "@react-native-firebase/auth";
 import { Stack, useRouter } from "expo-router";
 import MaterialCommunityIcons from "@expo/vector-icons/build/MaterialCommunityIcons";
 import { Colors } from "@/constants/Colors";
@@ -11,8 +10,9 @@ import * as Yup from "yup";
 import { AppForm, SubmitButton, TextFormField } from "@/components/forms";
 import TermsOfService from "@/components/TermsOfService";
 import PasswordFormField from "@/components/forms/PasswordFormField";
-import firestore from "@react-native-firebase/firestore";
 import { AuthService } from "@/services/AuthService";
+import { useAuth, useSignUp } from "@clerk/clerk-expo";
+import { useAuthService } from "@/hooks/useAuthService";
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required("Name is required."),
@@ -29,12 +29,26 @@ const validationSchema = Yup.object().shape({
 export default function Page() {
   const [isLoading, setIsLoading] = useState(false);
   const headerHeight = useHeaderHeight();
+  const { signUp, setActive } = useSignUp();
+  const { signOut } = useAuth();
 
-  const signUp = async (values: any) => {
+  const signUpWithEmail = async (values: any) => {
     const { name, email, password } = values;
-    setIsLoading(true);
-    await AuthService.registerWithEmail(name, email, password);
-    setIsLoading(false);
+    try {
+      await signOut();
+      const result = await signUp?.create({
+        firstName: name,
+        emailAddress: email,
+        password,
+      });
+
+      await setActive!({ session: result?.createdSessionId });
+      // Send the user an email with the verification code
+    } catch (err: any) {
+      // See https://clerk.com/docs/custom-flows/error-handling
+      // for more info on error handling
+      console.error(JSON.stringify(err, null, 2));
+    }
   };
 
   return (
@@ -53,7 +67,7 @@ export default function Page() {
         </Text>
         <AppForm
           initialValues={{ name: "", email: "", password: "" }}
-          onSubmit={signUp}
+          onSubmit={signUpWithEmail}
           validationSchema={validationSchema}
         >
           <View style={{ marginBottom: 10, width: "100%" }}>

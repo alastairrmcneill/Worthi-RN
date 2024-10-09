@@ -1,16 +1,20 @@
-import { StyleSheet, View, Text } from "react-native";
-import React from "react";
+import { StyleSheet, View, Text, ActivityIndicator } from "react-native";
+import React, { useEffect } from "react";
 import Screen from "@/components/Screen";
 import AccountButton from "@/components/AccountButton";
 import FloatingActionButton from "@/components/FloatingActionButton";
-import { useLoadUserProfile } from "@/hooks/useUserService";
-import { useLoadUserAccounts } from "@/hooks/useAccountService";
 import { useAccountStore } from "@/state/AccountStore";
+import { useAuth } from "@clerk/clerk-expo";
+import { useUserStore } from "@/state/UserStore";
+import { UserService } from "@/services/UserSerivce";
 
 export default function Page() {
-  const { accounts } = useAccountStore();
-  useLoadUserProfile();
-  useLoadUserAccounts();
+  const { userId } = useAuth();
+  const { currentUser, status } = useUserStore();
+
+  useEffect(() => {
+    UserService.loadUser(userId ?? "");
+  }, []);
 
   return (
     <Screen>
@@ -18,23 +22,9 @@ export default function Page() {
         <View style={{ position: "absolute", top: 15, right: 15 }}>
           <AccountButton />
         </View>
-
-        {accounts.map((account) => {
-          return (
-            <View key={account.id}>
-              <Text
-                style={{
-                  fontWeight: "bold",
-                  marginTop: 10,
-                }}
-              >
-                {account.name}
-              </Text>
-              <Text>{account.history[0].value}</Text>
-            </View>
-          );
-        })}
-
+        {status === "loading" && <ActivityIndicator />}
+        {status === "error" && <Text>Error fetching user data</Text>}
+        {status === "success" && <Text>{currentUser?.name}</Text>}
         <FloatingActionButton />
       </View>
     </Screen>

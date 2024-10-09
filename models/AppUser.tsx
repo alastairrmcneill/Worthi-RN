@@ -17,7 +17,7 @@ class AppUser {
 
   // Create from JSON
   static fromJSON(json: any): AppUser {
-    return new AppUser(json.id, json.name);
+    return new AppUser(json.id, json.first_name);
   }
 
   // Copy method

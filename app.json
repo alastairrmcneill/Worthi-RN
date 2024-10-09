@@ -15,7 +15,6 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.alastairmcneill.worthi",
-      "googleServicesFile": "./GoogleService-Info.plist",
       "entitlements": {
         "com.apple.developer.applesignin": ["Default"]
       },
@@ -26,8 +25,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.alastairmcneill.worthi",
-      "googleServicesFile": "./google-services.json"
+      "package": "com.alastairmcneill.worthi"
     },
     "web": {
       "bundler": "metro",
@@ -44,7 +42,8 @@
           }
         }
       ],
-      "expo-apple-authentication"
+      "expo-apple-authentication",
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true

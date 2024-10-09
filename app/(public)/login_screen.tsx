@@ -1,7 +1,5 @@
 import { StyleSheet, View, Text, Image, Alert } from "react-native";
 import React, { useEffect, useState } from "react";
-import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import auth from "@react-native-firebase/auth";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Colors } from "@/constants/Colors";
@@ -13,6 +11,10 @@ import { AppForm, SubmitButton, TextFormField } from "@/components/forms";
 import TermsOfService from "@/components/TermsOfService";
 import PasswordFormField from "@/components/forms/PasswordFormField";
 import { AuthService } from "@/services/AuthService";
+import { useOAuth, useSignIn, useSignUp } from "@clerk/clerk-expo";
+import { useWarmUpBrowser } from "@/hooks/useWarmUpBrowser";
+import { AuthStrategy } from "@/constants/AuthStrategy";
+import { useAuthService } from "@/hooks/useAuthService";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().required().email().label("Email"),
@@ -20,26 +22,31 @@ const validationSchema = Yup.object().shape({
 });
 
 export default function Page() {
+  const { signIn, setActive, isLoaded } = useSignIn();
+  const { signUp } = useSignUp();
+
+  const { signInWitheEmail, signInWithOAuth } = useAuthService();
+  useWarmUpBrowser();
+
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const logIn = async (values: any) => {
-    const { email, password } = values;
-
+    const { email: emailAddress, password } = values;
     setIsLoading(true);
-    await AuthService.signInWithEmail(email, password);
+    signInWitheEmail(emailAddress, password);
     setIsLoading(false);
   };
 
   const signInWithGoogle = async () => {
     setIsLoading(true);
-    await AuthService.signInWithGoogle();
+    signInWithOAuth(AuthStrategy.Google);
     setIsLoading(false);
   };
 
   const signInWithApple = async () => {
     setIsLoading(true);
-    await AuthService.signInWithApple();
+    signInWithOAuth(AuthStrategy.Apple);
     setIsLoading(false);
   };
 

@@ -1,52 +1,54 @@
-import { FirebaseAuthTypes } from "@react-native-firebase/auth";
 import { Slot, SplashScreen, useRouter, useSegments } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import auth from "@react-native-firebase/auth";
 import { ActivityIndicator, View } from "react-native";
 import { useFonts } from "expo-font";
 import Toast from "react-native-toast-message";
-import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import { AuthService } from "@/services/AuthService";
+import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
+import * as SecureStore from "expo-secure-store";
+import { SupabaseProvider } from "@/context/SupabaseContext";
+
+const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY as string;
+
+const tokenCache = {
+  async getToken(key: string) {
+    try {
+      return await SecureStore.getItemAsync(key);
+    } catch (error) {
+      await SecureStore.deleteItemAsync(key);
+      return null;
+    }
+  },
+  async saveToken(key: string, value: string) {
+    try {
+      return SecureStore.setItemAsync(key, value);
+    } catch (err) {
+      return;
+    }
+  },
+};
 
 const InitialLayout = () => {
-  const [initializing, setInitializing] = useState(true);
-  const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
   const router = useRouter();
   const segments = useSegments();
-
-  const onAuthStateChanged = (user: FirebaseAuthTypes.User | null) => {
-    setUser(user);
-    if (initializing) setInitializing(false);
-  };
+  const { isLoaded, isSignedIn } = useAuth();
 
   useEffect(() => {
-    const subscriber = AuthService.onAuthStateChanged(onAuthStateChanged);
-    return subscriber;
-  }, []);
-
-  useEffect(() => {
-    GoogleSignin.configure({
-      webClientId: process.env.GOOGLE_SIGN_IN_CLIENT_ID,
-    });
-  }, []);
-
-  useEffect(() => {
-    if (initializing) return;
+    if (!isLoaded) return;
 
     const inAuthGroup = segments[0] === "(authenticated)";
     const inPublicGroup = segments[0] === "(public)";
 
-    if (user && !inAuthGroup) {
+    if (isSignedIn && !inAuthGroup) {
       console.log("Navigating to authenticated group");
       router.replace("/(authenticated)/home_screen");
-    } else if (!user && !inPublicGroup) {
+    } else if (!isSignedIn && !inPublicGroup) {
       console.log("Navigating to public group");
       router.replace("/(public)/login_screen");
     }
-  }, [user, initializing]);
+  }, [isSignedIn, isLoaded]);
 
-  if (initializing)
+  if (!isLoaded)
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
         <ActivityIndicator size="large" />
@@ -79,9 +81,13 @@ export default function RootLayout() {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <InitialLayout />
-      <Toast />
-    </GestureHandlerRootView>
+    <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY} tokenCache={tokenCache}>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <SupabaseProvider>
+          <InitialLayout />
+          <Toast />
+        </SupabaseProvider>
+      </GestureHandlerRootView>
+    </ClerkProvider>
   );
 }
