@@ -91,12 +91,12 @@ export default function Page() {
             Forgot Password?
           </Text>
 
-          <View style={{ marginVertical: 15, width: "100%" }}>
+          <View style={{ marginTop: 15, marginBottom: 25, width: "100%" }}>
             <SubmitButton title="Log In" />
           </View>
         </AppForm>
 
-        <View style={{ flexDirection: "row", alignItems: "center", paddingBottom: 15 }}>
+        <View style={{ flexDirection: "row", alignItems: "center", paddingBottom: 25 }}>
           <View style={{ flex: 1, height: 1, backgroundColor: Colors.grey }} />
           <Text style={{ fontFamily: "mon", color: Colors.grey, paddingHorizontal: 15 }}>or</Text>
           <View style={{ flex: 1, height: 1, backgroundColor: Colors.grey }} />
@@ -160,8 +160,8 @@ const styles = StyleSheet.create({
   },
 
   headerImage: {
-    width: "30%",
-    height: "18%",
+    width: "25%",
+    height: "15%",
   },
   headerText: {
     textAlign: "left",

@@ -8,6 +8,7 @@ import { AppForm, SubmitButton, TextFormField } from "@/components/forms";
 import Toast from "react-native-toast-message";
 import { useSignIn } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
+import { useAuthService } from "@/hooks/useAuthService";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().email("Please enter a valid email.").required("Email is required."),
@@ -18,34 +19,13 @@ export default function Page() {
   const headerHeight = useHeaderHeight();
   const { signIn } = useSignIn();
   const router = useRouter();
+  const { forgotPassword } = useAuthService();
 
-  const forgotPassword = async (values: any) => {
+  const submit = async (values: any) => {
     const { email } = values;
     setIsLoading(true);
 
-    try {
-      await signIn
-        ?.create({
-          strategy: "reset_password_email_code",
-          identifier: email,
-        })
-        .then((res) => {
-          Toast.show({
-            type: "success",
-            text1: "Email Sent!",
-            text2: "Please check your email for your secure code.",
-          });
-          router.push({
-            pathname: "/(public)/reset_password_screen",
-            params: { email },
-          });
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    } catch (error) {
-      console.error(error);
-    }
+    forgotPassword(email);
     setIsLoading(false);
   };
 
@@ -60,7 +40,7 @@ export default function Page() {
     >
       <View style={[styles.container, { paddingTop: headerHeight }]}>
         <Text style={styles.headerText}>Forgot password</Text>
-        <AppForm initialValues={{ email: "" }} onSubmit={forgotPassword} validationSchema={validationSchema}>
+        <AppForm initialValues={{ email: "" }} onSubmit={submit} validationSchema={validationSchema}>
           <View style={{ marginBottom: 20, width: "100%" }}>
             <TextFormField
               name="email"

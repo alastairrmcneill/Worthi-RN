@@ -1,12 +1,15 @@
 import { useOAuth, useSignIn, useSignUp } from "@clerk/clerk-expo";
 import { AuthStrategy } from "@/constants/AuthStrategy";
 import { useState } from "react";
+import Toast from "react-native-toast-message";
+import { useRouter } from "expo-router";
 
 export const useAuthService = () => {
   const { signIn, setActive, isLoaded } = useSignIn();
   const { signUp } = useSignUp();
   const { startOAuthFlow: googleAuth } = useOAuth({ strategy: AuthStrategy.Google });
   const { startOAuthFlow: appleAuth } = useOAuth({ strategy: AuthStrategy.Apple });
+  const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -103,12 +106,56 @@ export const useAuthService = () => {
   const forgotPassword = async (email: string) => {
     setIsLoading(true);
     try {
-      console.log("Sending reset email to", email);
-      // Integrate Clerk's password reset API if needed
+      await signIn
+        ?.create({
+          strategy: "reset_password_email_code",
+          identifier: email,
+        })
+        .then((res) => {
+          Toast.show({
+            type: "success",
+            text1: "Email Sent!",
+            text2: "Please check your email for your secure code.",
+          });
+          router.push({
+            pathname: "/(public)/reset_password_screen",
+            params: { email },
+          });
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     } catch (error) {
       console.error(error);
     }
     setIsLoading(false);
+  };
+
+  const resetPassword = async (email: string, code: string, password: string) => {
+    try {
+      await signIn
+        ?.attemptFirstFactor({
+          strategy: "reset_password_email_code",
+          code,
+          password,
+        })
+        .then((result) => {
+          // Check if 2FA is required
+          if (result.status === "needs_second_factor") {
+          } else if (result.status === "complete") {
+            // Set the active session to
+            // the newly created session (user is now signed in)
+            setActive({ session: result.createdSessionId });
+          } else {
+            console.log(result);
+          }
+        })
+        .catch((err) => {
+          console.error("error", err.errors[0].longMessage);
+        });
+    } catch (error) {
+      console.error("Error resetting password:", error);
+    }
   };
 
   return {
@@ -117,5 +164,6 @@ export const useAuthService = () => {
     signInWithOAuth,
     signUpWithEmail,
     forgotPassword,
+    resetPassword,
   };
 };

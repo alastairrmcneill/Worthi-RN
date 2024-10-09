@@ -8,6 +8,7 @@ import { Colors } from "@/constants/Colors";
 import { AppForm, SubmitButton, TextFormField } from "@/components/forms";
 import PasswordFormField from "@/components/forms/PasswordFormField";
 import { useAuth, useSignIn } from "@clerk/clerk-expo";
+import { useAuthService } from "@/hooks/useAuthService";
 
 const validationSchema = Yup.object().shape({
   code: Yup.string()
@@ -27,34 +28,12 @@ export default function Page() {
   const headerHeight = useHeaderHeight();
   const { email } = useLocalSearchParams();
   const { signIn, setActive } = useSignIn();
+  const { resetPassword } = useAuthService();
 
-  const resetPassword = async (values: any) => {
+  const submit = async (values: any) => {
     const { code, password } = values;
     setIsLoading(true);
-    try {
-      await signIn
-        ?.attemptFirstFactor({
-          strategy: "reset_password_email_code",
-          code,
-          password,
-        })
-        .then((result) => {
-          // Check if 2FA is required
-          if (result.status === "needs_second_factor") {
-          } else if (result.status === "complete") {
-            // Set the active session to
-            // the newly created session (user is now signed in)
-            setActive({ session: result.createdSessionId });
-          } else {
-            console.log(result);
-          }
-        })
-        .catch((err) => {
-          console.error("error", err.errors[0].longMessage);
-        });
-    } catch (error) {
-      console.error("Error resetting password:", error);
-    }
+    resetPassword(email as string, code, password);
     setIsLoading(false);
   };
 
@@ -69,11 +48,7 @@ export default function Page() {
     >
       <View style={[styles.container, { paddingTop: headerHeight }]}>
         <Text style={styles.headerText}>Reset password</Text>
-        <AppForm
-          initialValues={{ code: "", password: "" }}
-          onSubmit={resetPassword}
-          validationSchema={validationSchema}
-        >
+        <AppForm initialValues={{ code: "", password: "" }} onSubmit={submit} validationSchema={validationSchema}>
           <View style={{ marginVertical: 20, width: "100%", gap: 10 }}>
             <Text style={{ fontFamily: "mon" }}>Reset the password for {email}.</Text>
             <TextFormField name="code" placeholder="Code" keyboardType="numeric" autoCorrect={false} />
