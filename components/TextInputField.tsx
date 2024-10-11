@@ -1,4 +1,4 @@
-import { StyleSheet, TextInput, View } from "react-native";
+import { StyleSheet, TextInput, View, Text } from "react-native";
 import React from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
@@ -12,6 +12,7 @@ interface TextInputFieldProps {
   autoComplete?: "email" | "password" | "username";
   secureTextEntry?: boolean;
   autoCorrect?: boolean;
+  label: string | null;
 }
 
 export default function TextInputField({
@@ -24,23 +25,27 @@ export default function TextInputField({
   autoComplete,
   secureTextEntry,
   autoCorrect,
+  label,
   ...otherProps
 }: TextInputFieldProps) {
   return (
-    <View style={styles.container}>
-      {icon && <MaterialCommunityIcons name={icon} size={24} color="gray" style={styles.icon} />}
-      <TextInput
-        style={styles.inputField}
-        placeholder={placeholder}
-        onChangeText={onChangeText}
-        onBlur={onBlur}
-        autoCapitalize={autoCapitalize}
-        keyboardType={keyboardType}
-        autoComplete={autoComplete}
-        secureTextEntry={secureTextEntry}
-        autoCorrect={autoCorrect}
-        {...otherProps}
-      />
+    <View>
+      {label && <Text style={{ fontFamily: "mon", marginBottom: 2 }}>{label}</Text>}
+      <View style={styles.container}>
+        {icon && <MaterialCommunityIcons name={icon} size={24} color="gray" style={styles.icon} />}
+        <TextInput
+          style={styles.inputField}
+          placeholder={placeholder}
+          onChangeText={onChangeText}
+          onBlur={onBlur}
+          autoCapitalize={autoCapitalize}
+          keyboardType={keyboardType}
+          autoComplete={autoComplete}
+          secureTextEntry={secureTextEntry}
+          autoCorrect={autoCorrect}
+          {...otherProps}
+        />
+      </View>
     </View>
   );
 }

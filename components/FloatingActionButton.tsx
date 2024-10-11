@@ -2,14 +2,16 @@ import React from "react";
 import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons"; // Use Expo vector icons for the FAB icon
 import { Colors } from "@/constants/Colors";
+import { useRouter } from "expo-router";
 
 export default function FloatingActionButton() {
+  const router = useRouter();
   return (
     <View style={{ position: "absolute", bottom: 0, right: 0, margin: 30 }}>
       <TouchableOpacity
         style={styles.container}
         onPress={() => {
-          console.log("FAB pressed");
+          router.push("/(authenticated)/NewAccountScreen");
         }}
       >
         <MaterialIcons name="add" size={24} color="white" />
