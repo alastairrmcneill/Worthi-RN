@@ -9,6 +9,7 @@ interface NumberInputFieldProps {
   placeholder: string;
   label: string | null;
   toggle: boolean;
+  disabled: boolean;
 }
 
 export default function NumberInputField({
@@ -17,56 +18,48 @@ export default function NumberInputField({
   placeholder,
   label,
   toggle,
+  disabled,
   ...otherProps
 }: NumberInputFieldProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [isNegative, setIsNegative] = useState(false);
   const [value, setValue] = useState("");
 
-  const toggleNegative = () => {
-    setIsNegative(!isNegative);
-
-    if (value) {
-      const cleanValue = value.replace(/[^0-9]/g, "");
-      setValue(cleanValue);
-      onChangeText(isNegative ? `-${cleanValue}` : cleanValue);
-    }
-  };
-
   return (
-    <View>
+    <View style={{ opacity: disabled ? 0.3 : 1 }}>
       {label && <Text style={{ fontFamily: "mon", marginBottom: 2 }}>{label}</Text>}
       <View style={styles.container}>
-        <View style={{ width: 50, marginRight: 10 }}>
-          <SegmentedControl
-            values={["+", "-"]}
-            selectedIndex={selectedIndex}
-            onChange={(event) => {
-              setSelectedIndex(event.nativeEvent.selectedSegmentIndex);
-              toggleNegative();
-              console.log("selectedSegmentIndex:", event.nativeEvent.selectedSegmentIndex);
-              console.log("target", event.nativeEvent.target);
-              console.log("value", event.nativeEvent.value);
-              // console.log("Is negative:", isNegative);
-              // console.log("Index:", selectedIndex);
-            }}
-            style={{ height: 25 }}
-            tintColor="#fff"
-          />
-        </View>
+        {toggle && (
+          <View style={{ width: 50, marginRight: 10 }}>
+            <SegmentedControl
+              values={["+", "-"]}
+              selectedIndex={selectedIndex}
+              onChange={(event) => {
+                if (disabled) return;
+                setSelectedIndex(event.nativeEvent.selectedSegmentIndex);
+                const isNegative = event.nativeEvent.selectedSegmentIndex == 1;
+
+                const cleanValue = value.replace(/[^0-9]/g, "");
+                setValue(cleanValue);
+                onChangeText(isNegative ? `-${cleanValue}` : cleanValue);
+              }}
+              style={{ height: 25 }}
+              tintColor="#fff"
+            />
+          </View>
+        )}
         <TextInput
           style={styles.inputField}
           placeholder={placeholder}
           onChangeText={(text) => {
-            console.log("Is negative:", isNegative);
-            console.log("Index:", selectedIndex);
+            if (disabled) return;
             const cleanValue = text.replace(/[^0-9]/g, "");
             setValue(cleanValue);
-            onChangeText(isNegative ? `-${cleanValue}` : cleanValue);
+            onChangeText(selectedIndex == 1 ? `-${cleanValue}` : cleanValue);
           }}
           onBlur={onBlur}
           keyboardType={"numeric"}
           value={value}
+          editable={!disabled}
           {...otherProps}
         />
       </View>

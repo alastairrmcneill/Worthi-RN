@@ -17,12 +17,7 @@ serve(async (req) => {
     }
 
     const { id, email_addresses, first_name, image_url } = (await req.json()).data;
-    console.log("🚀 ~ file: index.ts:20 ~ serve ~ image_url:", image_url);
-    console.log("🚀 ~ file: index.ts:20 ~ serve ~ first_name:", first_name);
-    console.log("🚀 ~ file: index.ts:20 ~ serve ~ id:", id);
-
     const email = email_addresses[0].email_address;
-    console.log("🚀 ~ file: index.ts:24 ~ serve ~ email:", email);
 
     const { data, error } = await supabase.from("users").insert({
       id: id,

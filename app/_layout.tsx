@@ -40,10 +40,8 @@ const InitialLayout = () => {
     const inPublicGroup = segments[0] === "(public)";
 
     if (isSignedIn && !inAuthGroup) {
-      console.log("Navigating to authenticated group");
       router.replace("/(authenticated)/home_screen");
     } else if (!isSignedIn && !inPublicGroup) {
-      console.log("Navigating to public group");
       router.replace("/(public)/login_screen");
     }
   }, [isSignedIn, isLoaded]);
