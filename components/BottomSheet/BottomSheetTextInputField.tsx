@@ -1,8 +1,9 @@
-import { StyleSheet, TextInput, View, Text } from "react-native";
+import { StyleSheet, View, Text } from "react-native";
 import React from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
 
-interface TextInputFieldProps {
+interface BottomSheetTextInputFieldProps {
   onChangeText: (text: string) => void;
   onBlur?: () => void;
   placeholder: string;
@@ -15,7 +16,7 @@ interface TextInputFieldProps {
   label: string | null;
 }
 
-export default function TextInputField({
+export default function BottomSheetTextInputField({
   onChangeText,
   onBlur,
   placeholder,
@@ -27,13 +28,13 @@ export default function TextInputField({
   autoCorrect,
   label,
   ...otherProps
-}: TextInputFieldProps) {
+}: BottomSheetTextInputFieldProps) {
   return (
     <View>
       {label && <Text style={{ fontFamily: "mon", marginBottom: 2 }}>{label}</Text>}
       <View style={styles.container}>
         {icon && <MaterialCommunityIcons name={icon} size={24} color="gray" style={styles.icon} />}
-        <TextInput
+        <BottomSheetTextInput
           style={styles.inputField}
           placeholder={placeholder}
           onChangeText={onChangeText}

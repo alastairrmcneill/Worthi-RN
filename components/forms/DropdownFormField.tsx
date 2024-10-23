@@ -4,7 +4,7 @@ import TextInputField from "../TextInputField";
 import ErrorText from "./ErrorText";
 import { View, Text } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import Dropdown from "../Dropdown";
+import Dropdown from "../DropdownInputField";
 
 interface FormValues {
   [key: string]: any;

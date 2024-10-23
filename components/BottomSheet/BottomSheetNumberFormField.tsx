@@ -1,17 +1,14 @@
 import React from "react";
 import { useFormikContext } from "formik";
-import TextInputField from "../TextInputField";
-import ErrorText from "./ErrorText";
-import { View, Text } from "react-native";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import Dropdown from "../DropdownInputField";
-import NumberInputField from "../NumberInputField";
+import { View } from "react-native";
+import { ErrorText } from "../forms";
+import BottomSheetNumberInputField from "./BottomSheetNumberInputField";
 
 interface FormValues {
   [key: string]: any;
 }
 
-interface NumberFormFieldProps {
+interface BottomSheetNumberFormFieldProps {
   name: string;
   placeholder: string;
   label: string | null;
@@ -19,11 +16,11 @@ interface NumberFormFieldProps {
   disabled: boolean;
 }
 
-export default function NumberFormField({ name, disabled, ...otherProps }: NumberFormFieldProps) {
+export default function BottomSheetNumberFormField({ name, disabled, ...otherProps }: BottomSheetNumberFormFieldProps) {
   const { setFieldTouched, handleChange, touched, errors } = useFormikContext<FormValues>();
   return (
     <View style={{ width: "100%", gap: 2 }}>
-      <NumberInputField
+      <BottomSheetNumberInputField
         onChangeText={handleChange(name)}
         onBlur={() => setFieldTouched(name)}
         disabled={disabled}

@@ -10,7 +10,7 @@ import { useFormikContext } from "formik";
 import Account from "@/models/Account";
 import AccountDatabase from "@/services/supabase/AccountDatabase";
 import { useAuth } from "@clerk/clerk-expo";
-import { AccountSerivce } from "@/services/AccountService";
+import { AccountService } from "@/services/AccountService";
 import AccountBalance from "@/models/AccountBalance";
 
 const validationSchema = Yup.object().shape({
@@ -41,7 +41,7 @@ export default function NewAccountScreen() {
     const accountBalance = new AccountBalance(null, null, newBalance, newInvested, new Date());
 
     // Save account to database
-    await AccountSerivce.createAccount(account, accountBalance);
+    await AccountService.createAccount(account, accountBalance);
   };
 
   // Component to handle the invested field with dynamic disabling

@@ -17,8 +17,26 @@ class AccountDatabase {
 
     return data?.[0]?.id || null;
   }
-  static async updateAccount(account: Account): Promise<void> {}
-  static async deleteAccount(accountId: string): Promise<void> {}
+  static async updateAccount(account: Account): Promise<void> {
+    const { error } = await supabase
+      .from("accounts")
+      .update(account.toJSON())
+      .eq("id", account.id);
+
+    if (error) {
+      console.log(error);
+    }
+  }
+  static async deleteAccount(accountId: string): Promise<void> {
+    const { error } = await supabase
+      .from("accounts")
+      .delete()
+      .eq("id", accountId);
+
+    if (error) {
+      console.log(error);
+    }
+  }
   static async getUserAccounts(userId: string): Promise<Account[]> {
     const { data, error } = await supabase
       .from("accounts")

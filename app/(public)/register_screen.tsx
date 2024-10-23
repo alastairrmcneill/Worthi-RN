@@ -77,6 +77,7 @@ export default function Page() {
               keyboardType="default"
               autoCapitalize="words"
               autoCorrect={true}
+              label={null}
             />
           </View>
           <View style={{ marginBottom: 10, width: "100%" }}>
@@ -87,6 +88,7 @@ export default function Page() {
               autoCapitalize="none"
               autoComplete="email"
               autoCorrect={false}
+              label={null}
             />
           </View>
           <View style={{ marginBottom: 20, width: "100%" }}>

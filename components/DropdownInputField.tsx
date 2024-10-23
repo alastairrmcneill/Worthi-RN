@@ -2,14 +2,14 @@ import { View, Text, TouchableOpacity, StyleSheet, FlatList, Modal, TouchableWit
 import React, { useCallback, useRef, useState } from "react";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 
-interface DropDownProps {
+interface DropDownInputFieldProps {
   label: string | null;
   data: string[];
   onChange: (item: string) => void;
   placeholder: string;
 }
 
-export default function Dropdown({ label, data, onChange, placeholder }: DropDownProps) {
+export default function DropdownInputField({ label, data, onChange, placeholder }: DropDownInputFieldProps) {
   const [expanded, setExpanded] = useState(false);
   const toggleExpanded = useCallback(() => setExpanded(!expanded), [expanded]);
   const [value, setValue] = useState("");

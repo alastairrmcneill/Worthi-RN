@@ -51,7 +51,7 @@ export default function Page() {
         <AppForm initialValues={{ code: "", password: "" }} onSubmit={submit} validationSchema={validationSchema}>
           <View style={{ marginVertical: 20, width: "100%", gap: 10 }}>
             <Text style={{ fontFamily: "mon" }}>Reset the password for {email}.</Text>
-            <TextFormField name="code" placeholder="Code" keyboardType="numeric" autoCorrect={false} />
+            <TextFormField name="code" placeholder="Code" keyboardType="numeric" autoCorrect={false} label={null} />
             <PasswordFormField
               name="password"
               placeholder="Password"
