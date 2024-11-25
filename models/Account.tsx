@@ -1,12 +1,21 @@
+import AccountBalance from "./AccountBalance";
+
 class Account {
   id: string | null;
   user_id: string;
   name: string;
   type: string;
   archived: boolean;
-  history: any[];
+  history: AccountBalance[];
 
-  constructor(id: string | null, user_id: string, name: string, type: string, archived: boolean, history: any[]) {
+  constructor(
+    id: string | null,
+    user_id: string,
+    name: string,
+    type: string,
+    archived: boolean,
+    history: AccountBalance[]
+  ) {
     this.id = id;
     this.user_id = user_id;
     this.name = name;
@@ -33,7 +42,7 @@ class Account {
       (json.name as string) ?? "",
       (json.type as string) ?? "",
       (json.archived as boolean) ?? false,
-      (json.history as any[]) ?? []
+      (json.history as AccountBalance[]) ?? []
     );
   }
 }

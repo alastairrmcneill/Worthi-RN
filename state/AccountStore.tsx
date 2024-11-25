@@ -1,24 +1,41 @@
+import { AccountTypeGroupDetails, AccountTypeGroups } from "@/constants/AccountTypes";
 import Account from "@/models/Account";
 import AccountBalance from "@/models/AccountBalance";
 import { create } from "zustand";
 
 type AccountStore = {
   accounts: Account[];
+  filteredAccounts: Account[];
   currentAccount: Account | null;
+  accountTypeFilter: string[];
+  accountTypeGroupFilter: AccountTypeGroups;
+  showArchived: boolean;
   setAccounts: (accounts: Account[]) => void;
   setCurrentAccount: (account: Account) => void;
   addAccountBalance: (accountBalance: AccountBalance) => void;
   updateAccount: (account: Account) => void;
   deleteAccount: (accountId: string) => void;
+  setAccountTypeFilter: (accountTypeFilter: string[]) => void;
+  setAccountTypeGroupFilter: (accountTypeGroupFilter: AccountTypeGroups) => void;
+  setShowArchived: (showArchived: boolean) => void;
+  filterAccounts: () => void;
   reset: () => void;
 };
 
 export const useAccountStore = create<AccountStore>((set, get) => ({
   accounts: [],
+  filteredAccounts: [],
   currentAccount: null,
-  setAccounts: (accounts: Account[]) => set({ accounts }),
-  setCurrentAccount: (currentAccount: Account) => set({ currentAccount }),
+  accountTypeFilter: [],
+  accountTypeGroupFilter: AccountTypeGroups.All,
+  showArchived: false,
+  setAccounts: (accounts: Account[]) => {
+    const { filterAccounts } = get();
 
+    set({ accounts: accounts });
+    filterAccounts();
+  },
+  setCurrentAccount: (currentAccount: Account) => set({ currentAccount }),
   addAccountBalance: (accountBalance: AccountBalance) => {
     const { accounts } = get();
 
@@ -65,6 +82,41 @@ export const useAccountStore = create<AccountStore>((set, get) => ({
 
     // Update the accounts in the store
     set({ accounts: updatedAccounts });
+  },
+
+  setAccountTypeFilter: (accountTypeFilter: string[]) => {
+    set({ accountTypeFilter });
+    get().filterAccounts();
+  },
+  setAccountTypeGroupFilter: (accountTypeGroupFilter: AccountTypeGroups) => {
+    set({ accountTypeGroupFilter });
+    get().filterAccounts();
+  },
+  setShowArchived: (showArchived: boolean) => {
+    set({ showArchived });
+    get().filterAccounts();
+  },
+  filterAccounts: () => {
+    const { accounts, accountTypeFilter, showArchived } = get();
+
+    var runningList = accounts;
+
+    if (accountTypeFilter.length != 0) {
+      runningList = runningList.filter((account) => accountTypeFilter.includes(account.type));
+    }
+
+    const groupFilter = get().accountTypeGroupFilter;
+    const groupFilterTypes = AccountTypeGroupDetails[groupFilter];
+
+    if (groupFilterTypes) {
+      runningList = runningList.filter((account) => groupFilterTypes.includes(account.type));
+    }
+
+    if (!showArchived) {
+      runningList = runningList.filter((account) => !account.archived);
+    }
+
+    set({ filteredAccounts: runningList });
   },
   reset: () => set({ accounts: [] }),
 }));

@@ -12,6 +12,7 @@ import AccountDatabase from "@/services/supabase/AccountDatabase";
 import { useAuth } from "@clerk/clerk-expo";
 import { AccountService } from "@/services/AccountService";
 import AccountBalance from "@/models/AccountBalance";
+import { AccountTypeOptions } from "@/constants/AccountTypes";
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required("Name is required."),
@@ -87,12 +88,7 @@ export default function NewAccountScreen() {
             autoCorrect={true}
           />
 
-          <DropdownFormField
-            name="type"
-            label="Type"
-            data={["Current Account", "Investment", "Loan", "Credit Card", "Pension"]}
-            placeholder="Select account type"
-          />
+          <DropdownFormField name="type" label="Type" data={AccountTypeOptions} placeholder="Select account type" />
 
           <NumberFormField name="balance" label="Balance" placeholder="£0.00" toggle={true} disabled={false} />
 
